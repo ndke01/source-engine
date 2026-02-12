@@ -28,6 +28,50 @@ Script author: ndke" ;;
     esac
 done
 
+if [[ "$PLATFORM" != "continuepc" && "$PLATFORM" != "continue" ]]; then
+    echo "Game:"
+    options_game=("Half-Life 2" "Half-Life 2 Episodes" "Half-life 2 Multiplayer" "Counter-Strike: Source" "Portal" "Day of Defeat: Source" "Half-Life: Source" "Custom Mod")
+    select build_game in "${options_game[@]}"
+    do
+        case $build_game in
+            "Half-Life 2")
+                GAME=""
+                break
+                ;;
+            "Half-Life 2 Episodes")
+                GAME="episodic"
+                break
+                ;;
+            "Half-life 2 Multiplayer")
+                GAME="hl2mp"
+                break
+                ;;
+            "Counter-Strike: Source")
+                GAME="cstrike"
+                break
+                ;;
+            "Portal")
+                GAME="portal"
+                break
+                ;;
+            "Day of Defeat: Source")
+                GAME="dod"
+                break
+                ;;
+            "Half-Life: Source")
+                GAME="hl1"
+                break
+                ;;
+            "Custom Mod")
+                echo -n "Enter custom mod name"
+                read GAME
+                break
+                ;;
+            *) echo "Wrong number $REPLY" ;;
+        esac
+    done
+fi
+
 echo -e "\nArchitecture:"
 
 if [[ "$PLATFORM" != "android" && "$PLATFORM" != "continuepc" && "$PLATFORM" != "continue" ]]; then
@@ -65,8 +109,7 @@ elif [[ "$PLATFORM" != "continuepc" && "$PLATFORM" != "continue" ]]; then
 fi
 
 echo -e "\nBuild type:"
-    options_type=("Release" "Debug")
-
+options_type=("Release" "Debug")
 select build_type in "${options_type[@]}"
 do
     case $build_type in
@@ -90,17 +133,17 @@ echo "----------------------------------------"
 
 if [[ "$PLATFORM" == "linux" ]]; then
     rm -r build
-    python3 ./waf configure -T $MODE --build-games=csso --prefix=../games/ --disable-warns --togles $BIT_PC_FLAGS
+    python3 ./waf configure -T $MODE --build-games=$GAME --prefix=../games/ --disable-warns --togles $BIT_PC_FLAGS
 
 elif [[ "$PLATFORM" == "android" ]]; then
     export ANDROID_NDK_HOME="$(readlink -f ../android-ndk-r10e)"
     export PATH="$(readlink -f ../clang+llvm-11.1.0-x86_64-linux-gnu-ubuntu-16.04/bin):$PATH"
     rm -r build
-    python3 ./waf configure -T $MODE --build-games=csso --prefix=../apk-sources/app/src/main/ --disable-warns --togles $BIT_FLAGS
+    python3 ./waf configure -T $MODE --build-games=$GAME --prefix=../apk-sources/app/src/main/ --disable-warns --togles $BIT_FLAGS
 
 elif [[ "$PLATFORM" == "server" ]]; then
     rm -r build
-    python3 ./waf configure -T $MODE --build-games=csso --prefix=out/ --disable-warns -d $BIT_PC_FLAGS
+    python3 ./waf configure -T $MODE --build-games=$GAME --prefix=out/ --disable-warns -d $BIT_PC_FLAGS
 
 elif [[ "$PLATFORM" == "continue" ]]; then
     export ANDROID_NDK_HOME="$(readlink -f ../android-ndk-r10e)"
